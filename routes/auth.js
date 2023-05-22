@@ -5,6 +5,7 @@ const { check } = require("express-validator");
 const { loginErrors, registerErrors } = require("../helpers/errorMessages")
 const { createUser, loginUser, revalidateToken, changePassword } = require("../controllers/auth");
 const { validateFields } = require("../middlewares/validateFields");
+const { validateToken } = require('../middlewares/validateToken');
 
 router.post(
     "/",
@@ -30,7 +31,7 @@ router.post(
     createUser
 );
 
-router.get("/renew", revalidateToken);
+router.get("/renew", validateToken, revalidateToken);
 
 router.post("/password", changePassword);
 

@@ -1,9 +1,11 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
+
+const { generateJWT } = require("../helpers/jwt");
 const User = require("../models/User");
 
 const createUser = async (req, res = express.request) => {
-    const { name, lastname, phone, birthdate, email, password } = req.body
+    const { name, lastname, phone, birthdate, email, password } = req.body;
     const newUser = { name, lastname, phone, email, password };
     newUser.birthdate = Date.parse(birthdate);
     newUser.type = 1;
@@ -12,23 +14,23 @@ const createUser = async (req, res = express.request) => {
         if (user) {
             return res.status(400).json({
                 ok: false,
-                msg: "El usuario ya existe"
-            })
+                msg: "El usuario ya existe",
+            });
         }
-        user = new User(newUser)
+        user = new User(newUser);
         const salt = bcrypt.genSaltSync();
         user.password = bcrypt.hashSync(password, salt);
         await user.save();
         res.status(200).json({
             ok: true,
-            user: newUser
+            user: newUser,
         });
     } catch (error) {
         console.log(error);
         res.status(500).json({
             ok: false,
-            error
-        })
+            error,
+        });
     }
 };
 
@@ -40,7 +42,7 @@ const loginUser = async (req, res = express.request) => {
         if (!user) {
             return res.status(400).json({
                 ok: false,
-                msg: "El usuario no existe"
+                msg: "El usuario no existe",
             });
         }
 
@@ -48,39 +50,44 @@ const loginUser = async (req, res = express.request) => {
         if (!passwordValid) {
             return res.status(400).json({
                 ok: false,
-                msg: "La contraseña no es válida"
+                msg: "La contraseña no es válida",
             });
         }
+        const token = await generateJWT(user.id, user.name);
 
         res.status(200).json({
             ok: true,
-            user
+            user,
+            token,
         });
-
     } catch (error) {
         console.log(error);
         res.status(500).json({
             ok: false,
-            error
+            error,
         });
     }
 };
 
 const revalidateToken = (req, res = express.request) => {
-    res.json({
+    const { uid, name } = req;
+
+    const token = await(generateJWT(uid, name));
+    res.status(200).json({
         ok: true,
+        token
     });
 };
 
 const changePassword = (req, res = express.request) => {
     res.json({
-        ok: true
-    })
-}
+        ok: true,
+    });
+};
 
 module.exports = {
     createUser,
     loginUser,
     revalidateToken,
-    changePassword
+    changePassword,
 };
