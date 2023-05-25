@@ -22,7 +22,25 @@ const createPost = async (req, res = express.request) => {
     }
 };
 
+const getPosts = async (req, res = express.request) => {
+    const posts = await Post.find().populate("user", "name");
+
+    try {
+        res.json({
+            ok: true,
+            posts
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            task: "Internal error"
+        })
+    }
+}
+
 
 module.exports = {
     createPost,
+    getPosts
 };
