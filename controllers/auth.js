@@ -69,10 +69,9 @@ const loginUser = async (req, res = express.request) => {
     }
 };
 
-const revalidateToken = (req, res = express.request) => {
+const revalidateToken = async (req, res = express.request) => {
     const { uid, name } = req;
-
-    const token = await(generateJWT(uid, name));
+    const token = await (generateJWT(uid, name));
     res.status(200).json({
         ok: true,
         token
