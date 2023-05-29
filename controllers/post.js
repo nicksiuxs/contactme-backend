@@ -39,8 +39,27 @@ const getPosts = async (req, res = express.request) => {
     }
 }
 
+const getPostsByUser = async (req, res = express.request) => {
+    const params = req.params;
+    console.log(params.id)
+    const posts = await Post.find({ user: id });
+
+    try {
+        res.json({
+            ok: true,
+            posts
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            ok: false,
+            task: "Internal error"
+        })
+    }
+}
 
 module.exports = {
     createPost,
-    getPosts
+    getPosts,
+    getPostsByUser
 };
