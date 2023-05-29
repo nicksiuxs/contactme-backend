@@ -8,7 +8,7 @@ const createUser = async (req, res = express.request) => {
     const { name, lastname, phone, birthdate, email, password } = req.body;
     const newUser = { name, lastname, phone, email, password };
     newUser.birthdate = Date.parse(birthdate);
-    newUser.type = 1;
+
     try {
         let user = await User.findOne({ email });
         if (user) {
@@ -21,9 +21,13 @@ const createUser = async (req, res = express.request) => {
         const salt = bcrypt.genSaltSync();
         user.password = bcrypt.hashSync(password, salt);
         await user.save();
+
+        const token = await generateJWT(user.id, user.name);
+
         res.status(200).json({
             ok: true,
             user: newUser,
+            token: token
         });
     } catch (error) {
         console.log(error);
