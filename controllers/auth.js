@@ -5,8 +5,8 @@ const { generateJWT } = require("../helpers/jwt");
 const User = require("../models/User");
 
 const createUser = async (req, res = express.request) => {
-    const { name, lastname, phone, birthdate, email, password } = req.body;
-    const newUser = { name, lastname, phone, email, password };
+    const { name, lastname, phone, birthdate, email, password, type } = req.body;
+    const newUser = { name, lastname, phone, email, password, type };
     newUser.birthdate = Date.parse(birthdate);
 
     try {
